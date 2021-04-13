@@ -85,6 +85,7 @@ if __name__ == '__main__':
                 landmark_positions, observations[t],
                 pseudo_ranges, observation_stdev
             )
+
             # Calculate posterior probability
             posteriors[pseudo_position] = motion_prob * observation_prob
 

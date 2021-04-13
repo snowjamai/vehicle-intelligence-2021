@@ -62,6 +62,12 @@ def observation_model(landmarks, observations, pseudo_ranges, stdev):
     # Initialize the measurement's probability to one.
     distance_prob = 1.0
 
+    if len(observations) > len(pseudo_ranges) or len(observations) == 0:
+        return 0
+    else:
+        for i in range(len(observations)):
+            distance_prob *= norm_pdf(observations[i],pseudo_ranges[i],stdev)
+
     # TODO: Calculate the observation model probability as follows:
     # (1) If we have no observations, we do not have any probability.
     # (2) Having more observations than the pseudo range indicates that

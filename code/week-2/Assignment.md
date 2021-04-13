@@ -58,4 +58,26 @@
 ---
 
 #main.py (line 84 ~ 86)
-8.  
+8.  obsercation_prob를 구하기 위해 observation_model 함수를 사용
+
+---
+# markov_localizer.py
+
+### observation_model 함수
+1. pseudo_range의 길이는 pseudo_position에서의 landmark와의 거리를 의미
+2. observations의 길이는 차량이 실제 관측한 거리 의미
+3. observations의 길이가 0 이라면 확률은 알수 없음
+4. observations의 길이가 pseudo_ranges보다 길수는 없음(observation은 관측값이고, pseudo_ranges는 pseudo position에서 landmark에 대한 거리차이이므로)
+5. obsercations의 관측값 평균이 pseudo_ranges[i]이고 표준편차가 stdev인 가우시안 분포에서 observations[i]가 관측되었을 때의 확률들을 모두 곱하여 distance_prob를 생성
+
+---
+#main.py (line 90 ~ 106)
+9.  각 위치 pseudo_position에대한 사후 확률 posteriors를 구하기 위해 앞에서 구한 motion_prob * observation_prob 해줌
+10. 구한 사후확률에 대한 분포를 normalize_distribution 함수를 이용하여 normalize 해줌
+11. 사전 확률을 사후 확률로 update함
+12. 구한 사후 확률을 graph라는 list에 append
+---
+
+#main.py (line 108 ~ )
+13. 앞에서 append한 graph를 이용하여 화면에 그래프를 그려 표시
+---
