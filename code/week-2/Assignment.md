@@ -76,8 +76,9 @@
 10. 구한 사후확률에 대한 분포를 normalize_distribution 함수를 이용하여 normalize 해줌
 11. 사전 확률을 사후 확률로 update함
 12. 구한 사후 확률을 graph라는 list에 append
----
 
+---
 #main.py (line 108 ~ )
 13. 앞에서 append한 graph를 이용하여 화면에 그래프를 그려 표시
+
 ---
