@@ -42,6 +42,14 @@ def motion_model(position, mov, priors, map_size, stdev):
     # Initialize the position's probability to zero.
     position_prob = 0.0
 
+    for i in range(map_size):
+        sub_dist = position - i
+
+        tr_pr = norm_pdf(sub_dist,mov,stdev)
+
+        position_prob += tr_pr * priors[i]
+
+
     # TODO: Loop over state space for all possible prior positions,
     # calculate the probability (using norm_pdf) of the vehicle
     # moving to the current position from that prior.
