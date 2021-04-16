@@ -1,4 +1,16 @@
 ---
+## Assignment 부분
+markov_localizer.py의 motion_model(line 41 ~ 50)의 부분과 observation_model(line 61 ~ 69)을 주석에 맞게 추가하였다.
+
+
+---
+## Markov Localizer 정의
+
+agent의 state를 추정하기 위한 방법으로 초기 보이는 물체를 이용하여 사전확률을 구한 후 해당 확률을 이용하여 물체가 이동하였을때의 확률을 구한다.
+그 후, 해당 확률과 이동하였을때 발견한 물체들에 의한 자신의 위치에 대한 확률을 구하고 이를 기반으로 자신의 위치를 추정한다.
+
+
+---
 # main.py (line 11 ~ 60)
 
 
@@ -58,7 +70,7 @@
 ---
 
 #main.py (line 84 ~ 86)
-8.  obsercation_prob를 구하기 위해 observation_model 함수를 사용
+8.  observation_prob를 구하기 위해 observation_model 함수를 사용
 
 ---
 
@@ -83,3 +95,6 @@
 13. 앞에서 append한 graph를 이용하여 화면에 그래프를 그려 표시
 
 ---
+
+## 느낀점
+위치 추정에 대한 알고리즘을 처음으로 배웠는데, 마치 강화학습과 비슷한 면이 많은것같아 굉장히 흥미롭게 들었다. agent 및 state로 이해를 하니 뭔가 더 친숙하게 다가왔고 많이 들어봤지만 너무 복잡하여 공부할 엄두를 못냈던 markov localization을 이해하게 되어 굉장히 뿌듯했다.

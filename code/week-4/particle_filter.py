@@ -1,5 +1,6 @@
 import numpy as np
 from helpers import distance
+from helpers import norm_pdf
 
 class ParticleFilter:
     def __init__(self, num_particles):
@@ -60,6 +61,7 @@ class ParticleFilter:
                     min_id = p['id']
                     min_x = p['x']
                     min_y = p['y']
+
             association = {
                 'id': min_id,
                 'x': min_x,
@@ -74,6 +76,46 @@ class ParticleFilter:
     #   Gaussian distribution.
     def update_weights(self, sensor_range, std_landmark_x, std_landmark_y,
                        observations, map_landmarks):
+
+        # for p in self.particles:
+
+        for p in self.particles:
+            CanSeeLandmark = []
+            TransformObserve = []
+
+            for id, pos in map_landmarks.items():
+                map_id = id
+                map_x = pos['x']
+                map_y = pos['y']
+
+                if distance(p, pos) < sensor_range:
+                    CanSeeLandmark.append({'id':map_id, 'x':map_x, 'y':map_y})
+
+            for obs in observations:
+                tmp = {}
+                tmp['x'] = p['x'] + obs['x'] * np.cos(p['t']) - obs['y'] * np.sin(p['t'])
+                tmp['y'] = p['y'] + obs['x'] * np.cos(p['t']) + obs['y'] * np.sin(p['t'])
+                TransformObserve.append(tmp)
+
+            if len(CanSeeLandmark) == 0:
+                continue
+            if len(CanSeeLandmark) != 0:
+                p['w'] = 0
+
+                associate_landmark = self.associate(CanSeeLandmark, TransformObserve)
+                assoc = []
+
+                for i in associate_landmark:
+                    px = norm_pdf(p['x'],i['x'],std_landmark_x)
+                    py = norm_pdf(p['y'],i['y'],std_landmark_y)
+                    p['w'] += px * py
+                    assoc.append(i['id'])
+
+                p['assoc'] = assoc
+                # print(pr)
+            else:
+                continue
+
         # TODO: For each particle, do the following:
         # 1. Select the set of landmarks that are visible
         #    (within the sensor range).
@@ -93,11 +135,31 @@ class ParticleFilter:
         #    for all the observations.
         # 5. Update the particle's weight by the calculated probability.
 
-        pass
+
 
     # Resample particles with replacement with probability proportional to
     #   their weights.
     def resample(self):
+        weights = [p['w'] for p in self.particles.copy()]
+        N = len(weights)
+        positions = (np.random.random(N) + range(N)) / N
+        resampled_particles = []
+        indexes = np.zeros(N, 'i')
+        cumulative_sum = np.cumsum(weights)
+        print(cumulative_sum)
+        print(positions)
+        i, j = 0, 0
+        while i < N and j < N:
+            if positions[i] < cumulative_sum[j]:
+                indexes[i] = j
+                i += 1
+            else:
+                j += 1
+        print(indexes)
+        resampled_particles.append(self.particles[i - 1])
+        self.particles = resampled_particles
+
+
         return
         # TODO: Select (possibly with duplicates) the set of particles
         #       that captures the posteior belief distribution, by
@@ -108,7 +170,6 @@ class ParticleFilter:
         # Finally, self.particles shall contain the newly drawn set of
         #   particles.
 
-        pass
 
     # Choose the particle with the highest weight (probability)
     def get_best_particle(self):
