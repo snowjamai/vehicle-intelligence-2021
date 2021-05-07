@@ -20,8 +20,8 @@ computed by get_helper_data function.
 '''
 
 # weights for costs
-REACH_GOAL = 0
-EFFICIENCY = 0
+REACH_GOAL = 1.
+EFFICIENCY = 1.
 
 DEBUG = False
 
@@ -32,14 +32,28 @@ def goal_distance_cost(vehicle, trajectory, predictions, data):
     Cost of being out of goal lane also becomes larger as vehicle approaches
     the goal distance.
     '''
-    return 0
+
+    if data[2] / vehicle.goal_s > 0.5:
+        cost = 0.0
+    elif data[2] > 0:
+        cost = 1 - exp((vehicle.goal_lane - data[0] + vehicle.goal_lane - data[1]) / (data[2]))
+    else:
+        cost = 1
+
+    return cost
 
 def inefficiency_cost(vehicle, trajectory, predictions, data):
     '''
     Cost becomes higher for trajectories with intended lane and final lane
     that have slower traffic.
     '''
-    return 0
+
+    if data[2] / vehicle.goal_s > 0.5:
+        cost = exp(-(data[0] + data[1]))
+    else:
+        cost = 1 - exp(-(data[0] + data[1]))
+
+    return cost
 
 def calculate_cost(vehicle, trajectory, predictions):
     '''
@@ -56,10 +70,11 @@ def calculate_cost(vehicle, trajectory, predictions):
                    * cf(vehicle, trajectory, predictions, trajectory_data)
         if DEBUG:
             print(
-                "%s has cost %.1f for lane %d" % \
+                "%s has cost %f for lane %d" % \
                 (cf.__name__, new_cost, trajectory[-1].lane)
             )
         cost += new_cost
+    # print("total_cost:", cost)
     return cost
 
 def get_helper_data(vehicle, trajectory, predictions):
@@ -76,7 +91,7 @@ def get_helper_data(vehicle, trajectory, predictions):
     in the cost functions.
     '''
 
-    last = trajectory[1]
+    last = trajectory[1] # next_state vehicle object
 
     if last.state == "PLCL":
         intended_lane = last.lane + 1

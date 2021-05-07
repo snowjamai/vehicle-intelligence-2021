@@ -34,6 +34,35 @@ class GNB():
         for each class. Record them for later use in prediction.
         '''
         # TODO: implement code.
+        r_v = [[0.], [0.], [0.], [0.]]
+        l_v = [[0.], [0.], [0.], [0.]]
+        k_v = [[0.], [0.], [0.], [0.]]
+
+
+        proc_x = [list(self.process_vars(x)) for x in X]
+
+        for val, label in zip(proc_x, Y):
+            if label == "right":
+                for i, r in enumerate(val):
+                    r_v[i].append(r)
+            elif label == "left":
+                for i, l in enumerate(val):
+                    l_v[i].append(l)
+            elif label == "keep":
+                for i, k in enumerate(val):
+                    k_v[i].append(k)
+
+        r_v = np.array(r_v)
+        self.r_m = [v.mean() for v in r_v]
+        self.r_std = [v.std() for v in r_v]
+
+        l_v = np.array(l_v)
+        self.l_m = [v.mean() for v in l_v]
+        self.l_std = [v.std() for v in l_v]
+
+        k_v = np.array(k_v)
+        self.k_m = [v.mean() for v in k_v]
+        self.k_std = [v.std() for v in k_v]
 
     # Given an observation (s, s_dot, d, d_dot), predict which behaviour
     # the vehicle is going to take using GNB.
@@ -46,5 +75,24 @@ class GNB():
         Return the label for the highest conditional probability.
         '''
         # TODO: implement code.
-        return "keep"
 
+        r_pr = l_pr = k_pr = 1.
+        r_norm = l_norm = k_norm = 0.
+
+        for i, obs in enumerate(observation):
+            r_pr = r_pr * gaussian_prob(obs,self.r_m[i], self.r_std[i])
+            r_norm = r_norm + gaussian_prob(obs,self.r_m[i], self.r_std[i])
+
+            l_pr = l_pr * gaussian_prob( obs,self.l_m[i], self.l_std[i])
+            l_norm = l_norm + gaussian_prob( obs,self.l_m[i], self.l_std[i])
+
+            k_pr = k_pr * gaussian_prob( obs,self.k_m[i], self.k_std[i])
+            k_norm = k_norm + gaussian_prob(obs, self.k_m[i], self.k_std[i])
+
+        r_pr = r_pr / r_norm
+        l_pr = l_pr / l_norm
+        k_pr = k_pr / k_norm
+
+        idx = np.argmax([l_pr , k_pr, r_pr])
+
+        return self.classes[idx]
